@@ -1,72 +1,42 @@
-# import pandas as pd
-# #from __ import __
-
-
-# class sumop:
-#     def __init__(self, data): 
-#         self.data = data
-#         self.df = pd.read_csv('var2.csv')
-       
-#     def __neg__(self):
-#         return  self.df.drop_duplicates()  
-    
-#     def dann(self):
-#         self.df = sumop('var2.csv')
-
-#         self.df = -self.df
-        
-        
-#         df_te = self.df[self.df['Тип операции'] == self.data]
-#         if self.data == "безналичный":
-#             print('количество удаленных строк:  ' ,100001 - (len(self.df1) + len(self.df2)),)
-#             df_te.to_csv(f'Beznal.csv', index=False )
-            
-#         elif self.data == "наличный" :
-#             print('количество удаленных строк:  ' ,100001 - (len(self.df1) + len(self.df2)),)
-#             df_te.to_csv(f'Nal.csv', index=False )
-        
-#     def __del__(self):
-#         print('удаление')
-
-
-# def main():
-#     smop = sumop('var2.csv')
-#     smop.dann()
-
-# if __name__ == '__main__':
-#     main()
 
 
 import pandas as pd
 
+
 class Sumop:
+    def __init__(self, filename: str):
+        self.filename = filename
+        self.df = pd.read_csv(filename)
 
-    def __init__(self, file_path: str):
-        self.file_path = file_path
-        self.df = pd.read_csv(self.file_path)
+    def __neg__(self):
 
-    def remove_duplicates(self) -> int:
+        return self.df.drop_duplicates()
 
-        original_len = len(self.df)
-        self.df = self.df.drop_duplicates()
-        removed_count = original_len - len(self.df)
-        return removed_count
+    def dann(self):
+        # удалени дубликатов
+        self.df = -self
 
-    def split_and_save(self):
+        # фильтрация 
+        df_nal = self.df[self.df['Тип операции'].str.strip() == 'наличный']
+        df_bez = self.df[self.df['Тип операции'].str.strip() == 'безналичный']
 
-        removed = self.remove_duplicates()
-        print(f"Количество удалённых строк: {removed}")
+        # вывод статистики
+        total_rows = len(self.df)
+        removed_rows = len(pd.read_csv(self.filename)) - total_rows
+        print(f'Количество удалённых строк: {removed_rows}')
 
-        # Фильтрация по типу операции
-        df_cash = self.df[self.df['Тип операции'] == 'наличный']
-        df_cashless = self.df[self.df['Тип операции'] == 'безналичный']
+        # сохранение в CSV
+        df_nal.to_csv('df_nal.csv', index=False)
+        df_bez.to_csv('df_bez.csv', index=False)
 
-        # Сохранение в файлы
-        df_cash.to_csv('Nal.csv', index=False, encoding='utf-8-sig')
-        df_cashless.to_csv('Beznal.csv', index=False, encoding='utf-8-sig')
-        print("Файлы 'Nal.csv' и 'Beznal.csv' успешно сохранены.")
+    def __del__(self):
+        print('Удаление объекта')
+
+
+def main():
+    smop = Sumop('var2.csv')
+    smop.dann()
 
 
 if __name__ == '__main__':
-    splitter = Sumop('var2.csv')
-    splitter.split_and_save()
+    main()
